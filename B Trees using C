@@ -402,13 +402,13 @@ int main() {
     int key;
 
     while (1) {
-        printf("\n========== B-TREE MENU ==========\n");
+        printf("\nB-TREE MENU\n");
         printf("1. Insert\n");
         printf("2. Display Level by Level\n");
         printf("3. Search\n");
         printf("4. Delete\n");
         printf("5. Exit\n");
-        printf("=================================\n");
+        printf("\n");
 
         printf("Enter your choice: ");
         scanf("%d", &choice);
