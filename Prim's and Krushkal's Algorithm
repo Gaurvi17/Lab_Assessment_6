@@ -1,0 +1,159 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+#define INF 999999
+
+typedef struct {
+    int u, v, weight;
+} Edge;
+
+Edge edges[MAX];
+int graph[MAX][MAX];
+int parent[MAX];
+
+int n, e;
+
+int compare(const void *a, const void *b) {
+    Edge *e1 = (Edge *)a;
+    Edge *e2 = (Edge *)b;
+
+    return e1->weight - e2->weight;
+}
+
+int find(int x) {
+    if (parent[x] == x)
+        return x;
+
+    return parent[x] = find(parent[x]);
+}
+
+void unionSet(int a, int b) {
+    int rootA = find(a);
+    int rootB = find(b);
+
+    parent[rootA] = rootB;
+}
+
+void prim() {
+    int selected[MAX] = {0};
+    int i, j;
+    int edgesCount = 0;
+    int totalCost = 0;
+
+    selected[0] = 1;
+
+    printf("\nPrim's Algorithm:\n");
+    printf("Selected Edges:\n");
+
+    while (edgesCount < n - 1) {
+        int min = INF;
+        int x = -1;
+        int y = -1;
+
+        for (i = 0; i < n; i++) {
+            if (selected[i]) {
+                for (j = 0; j < n; j++) {
+                    if (!selected[j] &&
+                        graph[i][j] != 0 &&
+                        graph[i][j] < min) {
+
+                        min = graph[i][j];
+                        x = i;
+                        y = j;
+                    }
+                }
+            }
+        }
+
+        if (x == -1) {
+            printf("MST does not exist (graph is disconnected).\n");
+            return;
+        }
+
+        printf("%c - %c : %d\n",
+               'A' + x, 'A' + y, min);
+
+        totalCost += min;
+        selected[y] = 1;
+        edgesCount++;
+    }
+
+    printf("Minimum Cost = %d\n", totalCost);
+}
+
+void kruskal() {
+    int i;
+    int edgesCount = 0;
+    int totalCost = 0;
+
+    for (i = 0; i < n; i++)
+        parent[i] = i;
+
+    qsort(edges, e, sizeof(Edge), compare);
+
+    printf("\nKruskal's Algorithm:\n");
+    printf("Selected Edges:\n");
+
+    for (i = 0; i < e && edgesCount < n - 1; i++) {
+        int u = edges[i].u;
+        int v = edges[i].v;
+        int weight = edges[i].weight;
+
+        if (find(u) != find(v)) {
+            unionSet(u, v);
+
+            printf("%c - %c : %d\n",
+                   'A' + u, 'A' + v, weight);
+
+            totalCost += weight;
+            edgesCount++;
+        }
+    }
+
+    if (edgesCount != n - 1) {
+        printf("MST does not exist (graph is disconnected).\n");
+        return;
+    }
+
+    printf("Minimum Cost = %d\n", totalCost);
+}
+
+int main() {
+    int i;
+    char u, v;
+    int w;
+
+    printf("Enter number of offices: ");
+    scanf("%d", &n);
+
+    printf("Enter number of edges: ");
+    scanf("%d", &e);
+
+    for (i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            graph[i][j] = 0;
+        }
+    }
+
+    printf("Enter edges (Office1 Office2 Cost):\n");
+
+    for (i = 0; i < e; i++) {
+        scanf(" %c %c %d", &u, &v, &w);
+
+        int a = u - 'A';
+        int b = v - 'A';
+
+        edges[i].u = a;
+        edges[i].v = b;
+        edges[i].weight = w;
+
+        graph[a][b] = w;
+        graph[b][a] = w;
+    }
+
+    prim();
+    kruskal();
+
+    return 0;
+}
